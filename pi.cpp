@@ -1,14 +1,11 @@
 #include <algorithm>
-#include <boost/format.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
 #include "fmt/core.h"
 #include "fmt/printf.h"
 
-using boost::format;
 namespace mpi = boost::mpi;
 
 int main(int argc, char **argv) {
@@ -41,6 +38,6 @@ int main(int argc, char **argv) {
             world.recv(mpi::any_source, 0, msg);
             I += msg;
         }
-        std::cout << format("%.12f\n") % (4. * I);
+        fmt::printf("%.20f\n", 4. * I);
     }
 }
