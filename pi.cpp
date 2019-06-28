@@ -5,6 +5,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include "fmt/core.h"
+#include "fmt/printf.h"
 
 using boost::format;
 namespace mpi = boost::mpi;
@@ -14,7 +16,7 @@ int main(int argc, char **argv) {
     mpi::communicator world;
 
     if (argc == 1) {
-        if (!world.rank()) std::cerr << format("USAGE:%s\tn\n") % argv[0];
+        if (!world.rank()) fmt::printf("USAGE:%s\tn\n", argv[0]);
         return EXIT_FAILURE;
     }
 
