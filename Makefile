@@ -1,6 +1,6 @@
 BOOST_FLAGS=-Iboost -Lboost/stage/lib -lboost_mpi -lboost_serialization -Wl,-rpath,./boost/stage/lib
 CUDA_FLAGS=-L/usr/local/cuda-9.1/lib64/ -lcuda -lcudart 
-CXXFLAGS=--std=c++17 -Wall -Wextra -Ifmt/include
+CXXFLAGS=--std=c++17 -Wall -Wextra -Ifmt/include -O3
 
 bin/dmbrot: bin boost mbrot/dmbrot.cpp
 	$(MAKE) -C mbrot 
@@ -26,3 +26,4 @@ bin:
 
 clean:
 	rm -rf bin
+	rm mbrot/*.o
