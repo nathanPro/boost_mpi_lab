@@ -41,15 +41,19 @@ int main(int argc, char **argv) {
     const size_t bitmap_size
         = 4 * width * (world.rank() == 0 ? height : (hi - lo));
     std::vector<png_byte> map(bitmap_size);
-    if (cpu)
-        run_in_cpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
-                   threads);
-    else
-        run_in_gpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
-                   threads);
+    auto calculate = [&]() {
+        if (cpu)
+            run_in_cpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
+                       threads);
+        else
+            run_in_gpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
+                       threads);
+    };
 
-    if (world.rank() != 0)
+    if (world.rank() != 0) {
+        calculate();
         world.send(0, 0, map.data(), map.size());
+    }
     else {
         std::vector<mpi::request> transmissions(world.size() - 1);
         for (int i = 1, lo = lines_per_proc; i < world.size();
@@ -58,6 +62,7 @@ int main(int argc, char **argv) {
             transmissions[i - 1] = world.irecv(
                 i, 0, map.data() + 4 * width * lo, 4 * width * (hi - lo));
         }
+        calculate();
         mpi::wait_all(begin(transmissions), end(transmissions));
         pic::canvas img(width, height, map.data());
         img.save(filename.c_str());
