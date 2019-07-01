@@ -39,8 +39,6 @@ void gpu_calculate(int width, int height, thrust::complex<REAL> c[2],
   const REAL dx = (c[1] - c[0]).real() / REAL(width),
              dy = (c[1] - c[0]).imag() / REAL(height);
 
-  cudaSetDevice(0);
-
   gpu::array<png_byte> data(4 * width * height);
   int num_blocks = (width * height + threads - 1) / threads;
   calculate_indices<M>
