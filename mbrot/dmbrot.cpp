@@ -41,20 +41,21 @@ int main(int argc, char **argv) {
     const size_t bitmap_size
         = 4 * width * (world.rank() == 0 ? height : (hi - lo));
     std::vector<png_byte> map(bitmap_size);
-    auto calculate = [&]() {
+    auto calculate = [&, dev = world.rank() % 2]() {
         if (cpu)
             run_in_cpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
                        threads);
-        else
+        else {
+            cudaSetDevice(dev);
             run_in_gpu(map.data(), c[0], c[1], delta, lo, hi, width, height,
                        threads);
+        }
     };
 
     if (world.rank() != 0) {
         calculate();
         world.send(0, 0, map.data(), map.size());
-    }
-    else {
+    } else {
         std::vector<mpi::request> transmissions(world.size() - 1);
         for (int i = 1, lo = lines_per_proc; i < world.size();
              i++, lo += lines_per_proc) {

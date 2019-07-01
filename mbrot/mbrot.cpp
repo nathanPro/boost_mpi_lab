@@ -4,8 +4,6 @@
 void run_in_gpu(png_byte *data, std::complex<float> c0, std::complex<float> c1,
                 std::complex<float> delta, size_t lo, size_t hi, size_t width,
                 size_t height, size_t threads) {
-    cudaSetDevice(0);
-
     thrust::complex<float> c = c0 + std::complex<float>{0., delta.imag() * lo};
 
     gpu::array<png_byte> gpu_data(4 * width * (hi - lo));
